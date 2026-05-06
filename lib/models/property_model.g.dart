@@ -38,12 +38,6 @@ class PropertyAdapter extends TypeAdapter<Property> {
       independent: fields[18] as bool?,
       muslimAllowed: fields[19] as bool?,
       floor: fields[20] as String?,
-      bigha: fields[21] as String?,
-      katha: fields[22] as String?,
-      lessa: fields[23] as String?,
-      pricePerBigha: fields[24] as String?,
-      pricePerKatha: fields[25] as String?,
-      pricePerLessa: fields[26] as String?,
       ownerName: fields[27] as String?,
       customLocation: fields[28] as String?,
       apartmentType: fields[29] as String?,
@@ -54,13 +48,14 @@ class PropertyAdapter extends TypeAdapter<Property> {
       propertyId: fields[34] as String,
       priceCategoryMax: fields[35] as int?,
       isAvailable: fields[36] as bool,
+      landType: fields[37] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Property obj) {
     writer
-      ..writeByte(37)
+      ..writeByte(38)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -104,17 +99,17 @@ class PropertyAdapter extends TypeAdapter<Property> {
       ..writeByte(20)
       ..write(obj.floor)
       ..writeByte(21)
-      ..write(obj.bigha)
+      ..write(obj.removedBigha)
       ..writeByte(22)
-      ..write(obj.katha)
+      ..write(obj.removedKatha)
       ..writeByte(23)
-      ..write(obj.lessa)
+      ..write(obj.removedLessa)
       ..writeByte(24)
-      ..write(obj.pricePerBigha)
+      ..write(obj.removedPricePerBigha)
       ..writeByte(25)
-      ..write(obj.pricePerKatha)
+      ..write(obj.removedPricePerKatha)
       ..writeByte(26)
-      ..write(obj.pricePerLessa)
+      ..write(obj.removedPricePerLessa)
       ..writeByte(27)
       ..write(obj.ownerName)
       ..writeByte(28)
@@ -134,7 +129,9 @@ class PropertyAdapter extends TypeAdapter<Property> {
       ..writeByte(35)
       ..write(obj.priceCategoryMax)
       ..writeByte(36)
-      ..write(obj.isAvailable);
+      ..write(obj.isAvailable)
+      ..writeByte(37)
+      ..write(obj.landType);
   }
 
   @override

@@ -69,23 +69,25 @@ class Property {
   @HiveField(20)
   final String? floor; // Floor / Total Floor
 
+  
   @HiveField(21)
-  final String? bigha;
+  final String? removedBigha = null;
 
   @HiveField(22)
-  final String? katha;
+  final String? removedKatha = null;
 
   @HiveField(23)
-  final String? lessa;
+  final String? removedLessa = null;
 
   @HiveField(24)
-  final String? pricePerBigha;
+  final String? removedPricePerBigha = null;
 
   @HiveField(25)
-  final String? pricePerKatha;
+  final String? removedPricePerKatha = null;
 
   @HiveField(26)
-  final String? pricePerLessa;
+  final String? removedPricePerLessa = null;
+
 
   @HiveField(27)
   final String? ownerName;
@@ -117,6 +119,9 @@ class Property {
   @HiveField(36)
   bool isAvailable;
 
+  @HiveField(37)
+  final String? landType;
+
   // -----------------------------------------------------
 
   Property({
@@ -141,12 +146,7 @@ class Property {
     this.independent,
     this.muslimAllowed,
     this.floor,
-    this.bigha,
-    this.katha,
-    this.lessa,
-    this.pricePerBigha,
-    this.pricePerKatha,
-    this.pricePerLessa,
+
     this.ownerName,
     this.customLocation,
     this.apartmentType,
@@ -157,7 +157,8 @@ class Property {
     this.propertyId =
         "", // ✅ DEFAULT VALUE (KEY FIX)required this.propertyId, // 👈 ADD
     this.priceCategoryMax,
-    this.isAvailable = true
+    this.isAvailable = true,
+    this.landType,
   });
 
   Map<String, dynamic> toJson() => {
@@ -180,12 +181,7 @@ class Property {
     "sbua": sbua,
     "carpetArea": carpetArea,
     "floor": floor,
-    "bigha": bigha,
-    "katha": katha,
-    "lessa": lessa,
-    "pricePerBigha": pricePerBigha,
-    "pricePerKatha": pricePerKatha,
-    "pricePerLessa": pricePerLessa,
+
     "mapUrl": mapUrl,
     "description": description,
     "ownerName": ownerName,
@@ -197,6 +193,7 @@ class Property {
     "pricePerSqft": pricePerSqft,
     'propertyId': propertyId,
     "isAvailable": isAvailable,
+    "landType": landType,
   };
 
   factory Property.fromJson(Map<String, dynamic> json) => Property(
@@ -219,12 +216,7 @@ class Property {
     sbua: json["sbua"],
     carpetArea: json["carpetArea"],
     floor: json["floor"],
-    bigha: json["bigha"],
-    katha: json["katha"],
-    lessa: json["lessa"],
-    pricePerBigha: json["pricePerBigha"],
-    pricePerKatha: json["pricePerKatha"],
-    pricePerLessa: json["pricePerLessa"],
+
     mapUrl: json["mapUrl"],
     description: json["description"],
     ownerName: json["ownerName"],
@@ -236,8 +228,14 @@ class Property {
     pricePerSqft: json["pricePerSqft"],
     propertyId: json['propertyId'] ?? "",
     isAvailable: json["isAvailable"] ?? true,
+    landType: json["landType"],
   );
-  Property copyWith({List<String>? images, String? propertyId, bool? isAvailable,}) {
+  Property copyWith({
+    List<String>? images,
+    String? propertyId,
+    bool? isAvailable,
+    String? landType,
+  }) {
     return Property(
       id: id,
       category: category,
@@ -258,12 +256,7 @@ class Property {
       sbua: sbua,
       carpetArea: carpetArea,
       floor: floor,
-      bigha: bigha,
-      katha: katha,
-      lessa: lessa,
-      pricePerBigha: pricePerBigha,
-      pricePerKatha: pricePerKatha,
-      pricePerLessa: pricePerLessa,
+
       mapUrl: mapUrl,
       description: description,
       ownerName: ownerName,
@@ -275,7 +268,7 @@ class Property {
       pricePerSqft: pricePerSqft,
       propertyId: propertyId ?? this.propertyId, // ✅ FIX
       isAvailable: isAvailable ?? this.isAvailable,
-
+      landType: landType ?? this.landType,
     );
   }
 
