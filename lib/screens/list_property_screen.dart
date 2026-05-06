@@ -18,7 +18,7 @@ class ListPropertyScreen extends StatefulWidget {
 
 class _ListPropertyScreenState extends State<ListPropertyScreen> {
   String? _category;
-  String? _type;
+  String? _condition;
   String? _landType;
   String? _bhk;
   String? _bathrooms;
@@ -33,6 +33,33 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   String? _apartmentType;
   String? _handoverDate;
   String? pricePerSqft;
+
+  final TextEditingController _landSpaceController = TextEditingController();
+
+  String selectedUnit = "Sq ft";
+
+  final List<String> landUnits = [
+    "Sq ft",
+    "Sqm",
+    "Acres",
+    "Hectares",
+    "Bigha (Assam)",
+    "Bigha (West Bengal)",
+    "Bigha (Rajasthan)",
+    "Bigha (Bihar)",
+    "Katha (Assam)",
+    "Katha (Bihar)",
+    "Katha (West Bengal)",
+    "Lecha/Lessa (Assam)",
+    "Guntha/Gunta",
+    "Cent",
+    "Kanal",
+    "Marla",
+    "Biswa",
+    "Dhur",
+    "Are",
+    "Decimals",
+  ];
   String? _furnishing;
   String? _selectedPriceCategoryLabel;
   int? _priceCategoryMax;
@@ -50,6 +77,10 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
     }
   }
 
+  String? _landAreaUnit;
+  final TextEditingController _landAreaController = TextEditingController();
+  final TextEditingController _landSqftController = TextEditingController();
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _pricePerSqftController = TextEditingController();
@@ -57,7 +88,7 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   final TextEditingController _sbuaController = TextEditingController();
   final TextEditingController _carpetAreaController = TextEditingController();
   final TextEditingController _floorController = TextEditingController();
- 
+
   final TextEditingController _mapUrlController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _propertyAgeController = TextEditingController();
@@ -65,13 +96,26 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   final TextEditingController _propertyPrefixController =
       TextEditingController();
 
-bool get isRent => _category == "Rent (Residential)";
-bool get isSale => _category == "Sale (Residential)";
-bool get isLand => _category == "Land";
+  bool get isRent => _category == "Rent (Residential)";
+  bool get isSale => _category == "Sale (Residential)";
+  bool get isLand => _category == "Land";
   bool? _lift;
   bool? _coupleFriendly;
   bool? _independent;
   bool? _muslimAllowed;
+
+  void calculateSqft() {
+    final value = double.tryParse(_landAreaController.text);
+
+    if (value == null || _landAreaUnit == null) {
+      _landSqftController.clear();
+      return;
+    }
+
+    final sqft = value * landUnitToSqft[_landAreaUnit]!;
+
+    _landSqftController.text = sqft.toStringAsFixed(2);
+  }
 
   @override
   void initState() {
@@ -101,8 +145,6 @@ bool get isLand => _category == "Land";
       _sbuaController.text = p.sbua ?? "";
       _carpetAreaController.text = p.carpetArea ?? "";
       _floorController.text = p.floor ?? "";
-
-     
 
       _mapUrlController.text = p.mapUrl ?? "";
       _descriptionController.text = p.description ?? "";
@@ -197,7 +239,13 @@ bool get isLand => _category == "Land";
                 _buildDropdown(
                   label: "Category",
                   value: _category,
-                  items: const ["Rent (Residential)", "Sale (Residential)", "Commercial", "Villas & Buildings", "Land"],
+                  items: const [
+                    "Rent (Residential)",
+                    "Sale (Residential)",
+                    "Commercial",
+                    "Villas & Buildings",
+                    "Land",
+                  ],
                   onChanged: (val) {
                     setState(() {
                       _category = val;
@@ -279,6 +327,81 @@ bool get isLand => _category == "Land";
                     controller: _pricePerSqftController,
                   ),
 
+                if (isLand)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextField(
+                            controller: _landSpaceController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _inputDecoration(
+                              "Space",
+                              "Ex: 12.5 or 20,000",
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: selectedUnit,
+                            dropdownColor: const Color(0xFF003845),
+                            decoration: _inputDecoration("Unit", null),
+                            items: landUnits
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(e),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() {
+                                  selectedUnit = val;
+                                });
+                              }
+                            },
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                if (isLand)
+                  _buildNumberField(
+                    label: "Land Area",
+                    controller: _landAreaController,
+                    onChanged: (_) => calculateSqft(),
+                  ),
+
+                if (isLand)
+                  _buildDropdown(
+                    label: "Unit",
+                    value: _landAreaUnit,
+                    items: landUnitToSqft.keys.toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _landAreaUnit = val;
+                      });
+
+                      calculateSqft();
+                    },
+                  ),
+
+                if (isLand)
+                  _buildTextField(
+                    label: "Area in Sq Ft",
+                    controller: _landSqftController,
+                  ),
                 if (isSale || isLand)
                   _buildDropdown(
                     label: "Price Category",
@@ -297,22 +420,22 @@ bool get isLand => _category == "Land";
 
                 if (isSale)
                   _buildDropdown(
-                    label: "Type",
-                    value: _type,
+                    label: "Condition",
+                    value: _condition,
                     items: const [
                       "Resell",
                       "Newly Constructed",
                       "Under Construction",
                     ],
-                    onChanged: (val) => setState(() => _type = val),
+                    onChanged: (val) => setState(() => _condition = val),
                   ),
-                if (isSale && _type == "Resell")
+                if (isSale && _condition == "Resell")
                   _buildNumberField(
                     label: "Property Age (Years)",
                     controller: _propertyAgeController,
                   ),
 
-                if (isSale && _type == "Under Construction")
+                if (isSale && _condition== "Under Construction")
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -441,8 +564,6 @@ bool get isLand => _category == "Land";
                     hint: "2 / 3",
                     controller: _floorController,
                   ),
-
-            
 
                 _buildTextField(
                   label: "Owner Name",
@@ -631,7 +752,15 @@ bool get isLand => _category == "Land";
                             ? _floorController.text
                             : null,
 
-                       
+                        landArea: _landAreaController.text.trim().isNotEmpty
+                            ? _landAreaController.text.trim()
+                            : null,
+
+                        landAreaUnit: _landAreaUnit,
+
+                        landAreaSqft: _landSqftController.text.trim().isNotEmpty
+                            ? _landSqftController.text.trim()
+                            : null,
 
                         parking: _carParking,
 
@@ -645,7 +774,7 @@ bool get isLand => _category == "Land";
                             ? _descriptionController.text
                             : null,
 
-                        propertyType: _type,
+                        propertyType: _condition,
                         lift: _lift,
                         coupleFriendly: _coupleFriendly,
                         independent: _independent,
@@ -976,3 +1105,25 @@ const List<PriceCategory> priceCategories = [
   PriceCategory("Under 2 CR", 20000000),
   PriceCategory("No Limit", null),
 ];
+
+const Map<String, double> landUnitToSqft = {
+  "Sqm": 10.7639,
+  "Acres": 43560,
+  "Hectares": 107639,
+  "Bigha (Assam)": 14400,
+  "Bigha (West Bengal)": 14400,
+  "Bigha (Rajasthan)": 27225,
+  "Bigha (Bihar)": 27220,
+  "Katha (Assam)": 2880,
+  "Katha (Bihar)": 1361,
+  "Katha (West Bengal)": 720,
+  "Lecha/Lessa (Assam)": 144,
+  "Guntha/Gunta": 1089,
+  "Cent": 435.6,
+  "Kanal": 5445,
+  "Marla": 272.25,
+  "Biswa": 1350,
+  "Dhur": 68.06,
+  "Are": 1076.39,
+  "Decimals": 435.6,
+};
