@@ -21,8 +21,6 @@ import 'list_property_screen.dart';
 import 'property_listing_screen.dart';
 import 'client_details_screen.dart';
 
-
-
 class PropertyDetailsScreen extends StatelessWidget {
   final Property property;
   final int index;
@@ -33,8 +31,8 @@ class PropertyDetailsScreen extends StatelessWidget {
     required this.index,
   });
 
-bool get isRent => property.category == "Rent (Residential)";
-bool get isSale => property.category == "Sale (Residential)";
+  bool get isRent => property.category == "Rent (Residential)";
+  bool get isSale => property.category == "Sale (Residential)";
   bool get isLand => property.category == "Land";
 
   String formatPricePerSqft() {
@@ -57,12 +55,13 @@ bool get isSale => property.category == "Sale (Residential)";
 
   String buildPropertyShareText() {
     final profileBox = Hive.box<ProfileModel>('profile');
-ProfileModel? profile;
+    ProfileModel? profile;
 
-if (profileBox.isNotEmpty) {
-  profile = profileBox.getAt(0);
-}
-String text = """
+    if (profileBox.isNotEmpty) {
+      profile = profileBox.getAt(0);
+    }
+    String text =
+        """
 📍 ${property.title}
 🆔 ${property.propertyId}
 📌 ${property.location}
@@ -70,63 +69,82 @@ ${property.customLocation?.isNotEmpty == true ? "📍 Nearby: ${property.customL
 💰 ₹${property.price}
 """;
 
-  // 🔹 COMPACT DETAILS LINE
-  List<String> details = [];
+    // 🔹 COMPACT DETAILS LINE
+    List<String> details = [];
 
-  if (property.bhk != null) details.add("🛏 ${property.bhk}");
-  if (property.bathrooms != null) details.add("🚿 ${property.bathrooms} Ba");
-  if (property.furnishing != null) details.add("🛋 ${property.furnishing}");
-  if (property.sbua != null) details.add("📏 ${property.sbua} sqft");
-  if (property.carpetArea != null) details.add("📐 ${property.carpetArea} sqft");
-  if (property.parking != null) details.add("🚗 ${property.parking}");
-  if (property.lift != null) {
-    details.add("🛗 ${property.lift! ? "Yes" : "No"}");
-  }
+    if (property.bhk != null) details.add("🛏 ${property.bhk}");
+    if (property.bathrooms != null) details.add("🚿 ${property.bathrooms} Ba");
+    if (property.furnishing != null) details.add("🛋 ${property.furnishing}");
+    if (property.sbua != null) details.add("📏 ${property.sbua} sqft");
+    if (property.carpetArea != null)
+      details.add("📐 ${property.carpetArea} sqft");
+    if (property.parking != null) details.add("🚗 ${property.parking}");
+    if (property.lift != null) {
+      details.add("🛗 ${property.lift! ? "Yes" : "No"}");
+    }
 
-  if (isSale && property.propertyType != null) {
-    details.add("🧾 ${property.propertyType}");
-  }
+    if (isSale && property.propertyType != null) {
+      details.add("🧾 ${property.propertyType}");
+    }
 
-  if (property.apartmentType != null) {
-    details.add("🏢 ${property.apartmentType}");
-  }
+    if (property.apartmentType != null) {
+      details.add("🏢 ${property.apartmentType}");
+    }
 
-  if (property.floor != null) {
-    details.add("🏬 Floor ${property.floor}");
-  }
+    if (property.floor != null) {
+      details.add("🏬 Floor ${property.floor}");
+    }
 
-  if (property.propertyAge != null) {
-    details.add("⏳ ${property.propertyAge} yrs");
-  }
+    if (property.propertyAge != null) {
+      details.add("⏳ ${property.propertyAge} yrs");
+    }
 
-  if (property.handoverDate != null) {
-    details.add("📅 ${property.handoverDate}");
-  }
+    if (property.handoverDate != null) {
+      details.add("📅 ${property.handoverDate}");
+    }
 
-  if (isRent && property.coupleFriendly != null) {
-    details.add("❤️ ${property.coupleFriendly! ? "Couple OK" : "No Couples"}");
-  }
+    if (isRent && property.coupleFriendly != null) {
+      details.add(
+        "❤️ ${property.coupleFriendly! ? "Couple OK" : "No Couples"}",
+      );
+    }
 
-  if (isRent && property.independent != null) {
-    details.add("🏠 ${property.independent! ? "Independent" : "Shared"}");
-  }
+    if (isRent && property.independent != null) {
+      details.add("🏠 ${property.independent! ? "Independent" : "Shared"}");
+    }
 
-  // LAND DETAILS
- 
-  // 🔹 ADD DETAILS LINE
-  if (details.isNotEmpty) {
-    text += "\n\n${details.join(" | ")}";
-  }
+    // LAND DETAILS
 
-  // 🔹 DESCRIPTION
-  if (property.description != null &&
-      property.description!.trim().isNotEmpty) {
-    text += "\n\n📝 ${property.description}";
-  }
+    if (isLand) {
+      if (property.landArea != null && property.landArea!.trim().isNotEmpty) {
+        details.add("🌍 ${property.landArea} ${property.landAreaUnit ?? ""}");
+      }
 
-  // 🔹 PROFILE
-  if (profile != null) {
-    text += """
+      if (property.landAreaSqft != null &&
+          property.landAreaSqft!.trim().isNotEmpty) {
+        details.add("📐 ${property.landAreaSqft} sq ft");
+      }
+
+      if (property.landType != null && property.landType!.trim().isNotEmpty) {
+        details.add("🏷 ${property.landType}");
+      }
+    }
+
+    // 🔹 ADD DETAILS LINE
+    if (details.isNotEmpty) {
+      text += "\n\n${details.join(" | ")}";
+    }
+
+    // 🔹 DESCRIPTION
+    if (property.description != null &&
+        property.description!.trim().isNotEmpty) {
+      text += "\n\n📝 ${property.description}";
+    }
+
+    // 🔹 PROFILE
+    if (profile != null) {
+      text +=
+          """
 
 ━━━━━━━━━━━━━━━━━
 👤 ${profile.name}
@@ -135,7 +153,7 @@ ${property.customLocation?.isNotEmpty == true ? "📍 Nearby: ${property.customL
 📞 ${profile.phone}
 ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
 """;
-  }
+    }
 
     return text
         .split('\n')
@@ -192,8 +210,6 @@ ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
       ).showSnackBar(const SnackBar(content: Text("WhatsApp not installed")));
     }
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -466,7 +482,29 @@ ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
                           ),
 
                         // ---------- LAND ONLY ----------
-                       
+                        if (isLand) ...[
+                          _infoRow(
+                            "Land Area",
+                            property.safeDash(property.landArea),
+                          ),
+
+                          _infoRow(
+                            "Unit",
+                            property.safeDash(property.landAreaUnit),
+                          ),
+
+                          _infoRow(
+                            "Area in Sq Ft",
+                            property.landAreaSqft != null
+                                ? "${property.safeDash(property.landAreaSqft)} sq ft"
+                                : "-",
+                          ),
+                        ],
+
+                        _infoRow(
+                          "Land Type",
+                          property.safeDash(property.landType),
+                        ),
 
                         const SizedBox(height: 25),
 

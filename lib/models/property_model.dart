@@ -69,7 +69,6 @@ class Property {
   @HiveField(20)
   final String? floor; // Floor / Total Floor
 
-  
   @HiveField(21)
   final String? removedBigha = null;
 
@@ -87,7 +86,6 @@ class Property {
 
   @HiveField(26)
   final String? removedPricePerLessa = null;
-
 
   @HiveField(27)
   final String? ownerName;
@@ -121,6 +119,33 @@ class Property {
 
   @HiveField(37)
   final String? landType;
+
+  @HiveField(38)
+  final String? landArea;
+
+  @HiveField(39)
+  final String? landAreaUnit;
+
+  @HiveField(40)
+  final String? landAreaSqft;
+
+  @HiveField(41)
+  final String? commercialType;
+
+  @HiveField(42)
+  final String? commercialSection;
+
+  @HiveField(43)
+  final String? shopNumber;
+
+  @HiveField(44)
+  final String? frontage;
+
+  @HiveField(45)
+  final String? totalSpace;
+
+  @HiveField(46)
+  final List<String>? videos;
 
   // -----------------------------------------------------
 
@@ -159,6 +184,15 @@ class Property {
     this.priceCategoryMax,
     this.isAvailable = true,
     this.landType,
+    this.landArea,
+    this.landAreaUnit,
+    this.landAreaSqft,
+    this.commercialType,
+    this.commercialSection,
+    this.shopNumber,
+    this.frontage,
+    this.totalSpace,
+    this.videos,
   });
 
   Map<String, dynamic> toJson() => {
@@ -194,6 +228,15 @@ class Property {
     'propertyId': propertyId,
     "isAvailable": isAvailable,
     "landType": landType,
+    "landArea": landArea,
+    "landAreaUnit": landAreaUnit,
+    "landAreaSqft": landAreaSqft,
+    "commercialType": commercialType,
+    "commercialSection": commercialSection,
+    "shopNumber": shopNumber,
+    "frontage": frontage,
+    "totalSpace": totalSpace,
+    "videos": videos,
   };
 
   factory Property.fromJson(Map<String, dynamic> json) => Property(
@@ -229,12 +272,30 @@ class Property {
     propertyId: json['propertyId'] ?? "",
     isAvailable: json["isAvailable"] ?? true,
     landType: json["landType"],
+    landArea: json["landArea"],
+    landAreaUnit: json["landAreaUnit"],
+    landAreaSqft: json["landAreaSqft"],
+    commercialType: json["commercialType"],
+    commercialSection: json["commercialSection"],
+    shopNumber: json["shopNumber"],
+    frontage: json["frontage"],
+    totalSpace: json["totalSpace"],
+    videos: json["videos"] != null ? List<String>.from(json["videos"]) : [],
   );
   Property copyWith({
     List<String>? images,
     String? propertyId,
     bool? isAvailable,
     String? landType,
+    String? landArea,
+    String? landAreaUnit,
+    String? landAreaSqft,
+    String? commercialType,
+    String? commercialSection,
+    String? shopNumber,
+    String? frontage,
+    String? totalSpace,
+    List<String>? videos,
   }) {
     return Property(
       id: id,
@@ -269,6 +330,15 @@ class Property {
       propertyId: propertyId ?? this.propertyId, // ✅ FIX
       isAvailable: isAvailable ?? this.isAvailable,
       landType: landType ?? this.landType,
+      landArea: landArea ?? this.landArea,
+      landAreaUnit: landAreaUnit ?? this.landAreaUnit,
+      landAreaSqft: landAreaSqft ?? this.landAreaSqft,
+      commercialType: commercialType ?? this.commercialType,
+      commercialSection: commercialSection ?? this.commercialSection,
+      shopNumber: shopNumber ?? this.shopNumber,
+      frontage: frontage ?? this.frontage,
+      totalSpace: totalSpace ?? this.totalSpace,
+      videos: videos ?? this.videos,
     );
   }
 

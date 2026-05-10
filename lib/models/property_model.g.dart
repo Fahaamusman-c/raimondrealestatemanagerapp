@@ -49,13 +49,22 @@ class PropertyAdapter extends TypeAdapter<Property> {
       priceCategoryMax: fields[35] as int?,
       isAvailable: fields[36] as bool,
       landType: fields[37] as String?,
+      landArea: fields[38] as String?,
+      landAreaUnit: fields[39] as String?,
+      landAreaSqft: fields[40] as String?,
+      commercialType: fields[41] as String?,
+      commercialSection: fields[42] as String?,
+      shopNumber: fields[43] as String?,
+      frontage: fields[44] as String?,
+      totalSpace: fields[45] as String?,
+      videos: (fields[46] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Property obj) {
     writer
-      ..writeByte(38)
+      ..writeByte(47)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -131,7 +140,25 @@ class PropertyAdapter extends TypeAdapter<Property> {
       ..writeByte(36)
       ..write(obj.isAvailable)
       ..writeByte(37)
-      ..write(obj.landType);
+      ..write(obj.landType)
+      ..writeByte(38)
+      ..write(obj.landArea)
+      ..writeByte(39)
+      ..write(obj.landAreaUnit)
+      ..writeByte(40)
+      ..write(obj.landAreaSqft)
+      ..writeByte(41)
+      ..write(obj.commercialType)
+      ..writeByte(42)
+      ..write(obj.commercialSection)
+      ..writeByte(43)
+      ..write(obj.shopNumber)
+      ..writeByte(44)
+      ..write(obj.frontage)
+      ..writeByte(45)
+      ..write(obj.totalSpace)
+      ..writeByte(46)
+      ..write(obj.videos);
   }
 
   @override

@@ -18,6 +18,8 @@ class ListPropertyScreen extends StatefulWidget {
 
 class _ListPropertyScreenState extends State<ListPropertyScreen> {
   String? _category;
+  String? _type;
+  String? _commercialSection;
   String? _condition;
   String? _landType;
   String? _bhk;
@@ -81,6 +83,12 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   final TextEditingController _landAreaController = TextEditingController();
   final TextEditingController _landSqftController = TextEditingController();
 
+  final TextEditingController _shopNumberController = TextEditingController();
+
+  final TextEditingController _frontageController = TextEditingController();
+
+  final TextEditingController _totalSpaceController = TextEditingController();
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _pricePerSqftController = TextEditingController();
@@ -99,6 +107,7 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   bool get isRent => _category == "Rent (Residential)";
   bool get isSale => _category == "Sale (Residential)";
   bool get isLand => _category == "Land";
+  bool get isCommercial => _category == "Commercial";
   bool? _lift;
   bool? _coupleFriendly;
   bool? _independent;
@@ -255,6 +264,37 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
                     });
                   },
                 ),
+                if (isCommercial)
+                  _buildDropdown(
+                    label: "Type",
+                    value: _type,
+                    items: const ["Sale", "Rent", "Lease"],
+                    onChanged: (val) {
+                      setState(() {
+                        _type = val;
+                      });
+                    },
+                  ),
+
+                if (isCommercial)
+                  _buildDropdown(
+                    label: "Section",
+                    value: _commercialSection,
+                    items: const [
+                      "Shop",
+                      "Showroom",
+                      "Office Space",
+                      "Godown",
+                      "Cafe",
+                      "Restaurant",
+                      "Institute",
+                    ],
+                    onChanged: (val) {
+                      setState(() {
+                        _commercialSection = val;
+                      });
+                    },
+                  ),
 
                 if (isLand)
                   _buildDropdown(
@@ -435,7 +475,7 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
                     controller: _propertyAgeController,
                   ),
 
-                if (isSale && _condition== "Under Construction")
+                if (isSale && _condition == "Under Construction")
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -478,6 +518,24 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
                   label: "Custom Location (Optional)",
                   onChanged: (v) => _customLocation = v,
                 ),
+
+                if (isCommercial)
+                  _buildTextField(
+                    label: "Shop No.",
+                    controller: _shopNumberController,
+                  ),
+
+                if (isCommercial)
+                  _buildNumberField(
+                    label: "Frontage in Sq Ft",
+                    controller: _frontageController,
+                  ),
+
+                if (isCommercial)
+                  _buildNumberField(
+                    label: "Total Space",
+                    controller: _totalSpaceController,
+                  ),
 
                 if (!isLand)
                   _buildDropdown(
