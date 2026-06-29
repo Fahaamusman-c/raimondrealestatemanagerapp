@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/property_model.dart';
+import '../utils/media_storage.dart';
 
 class ListPropertyScreen extends StatefulWidget {
   final Property? existingProperty;
@@ -21,6 +22,7 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   String? _type;
   String? _commercialSection;
   String? _condition;
+  String? _villaType;
   String? _landType;
   String? _bhk;
   String? _bathrooms;
@@ -79,6 +81,19 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
     }
   }
 
+  final List<String> _videos = [];
+  Future<void> _pickVideo() async {
+    final picker = ImagePicker();
+
+    final XFile? picked = await picker.pickVideo(source: ImageSource.gallery);
+
+    if (picked != null) {
+      setState(() {
+        _videos.add(picked.path);
+      });
+    }
+  }
+
   String? _landAreaUnit;
   final TextEditingController _landAreaController = TextEditingController();
   final TextEditingController _landSqftController = TextEditingController();
@@ -112,6 +127,7 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
   bool? _coupleFriendly;
   bool? _independent;
   bool? _muslimAllowed;
+  bool get isVilla => _category == "Villas & Buildings";
 
   void calculateSqft() {
     final value = double.tryParse(_landAreaController.text);
@@ -135,6 +151,13 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
       final p = widget.existingProperty!;
 
       _category = p.category;
+      _type = p.commercialType;
+      _commercialSection = p.commercialSection;
+      _villaType = p.commercialType;
+
+      _shopNumberController.text = p.shopNumber ?? "";
+      _frontageController.text = p.frontage ?? "";
+      _totalSpaceController.text = p.totalSpace ?? "";
       _propertyPrefixController.text = getPropertyPrefix(p.category);
       _propertyIdController.text = p.propertyId.replaceFirst(
         getPropertyPrefix(p.category),
@@ -181,6 +204,10 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
           .label;
 
       _images.addAll(p.images);
+
+      if (p.videos != null) {
+        _videos.addAll(p.videos!);
+      }
     }
   }
 
@@ -292,6 +319,18 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
                     onChanged: (val) {
                       setState(() {
                         _commercialSection = val;
+                      });
+                    },
+                  ),
+
+                if (isVilla)
+                  _buildDropdown(
+                    label: "Type",
+                    value: _villaType,
+                    items: const ["Sale", "Rent", "Lease"],
+                    onChanged: (val) {
+                      setState(() {
+                        _villaType = val;
                       });
                     },
                   ),
@@ -737,6 +776,53 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
 
                 const SizedBox(height: 20),
 
+                const SizedBox(height: 20),
+
+                Text(
+                  "Videos",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.20),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: _pickVideo,
+                  child: const Text("+ Add Video"),
+                ),
+                if (_videos.isNotEmpty)
+                  Column(
+                    children: _videos.map((video) {
+                      return Card(
+                        color: Colors.white10,
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.video_file,
+                            color: Colors.white,
+                          ),
+                          title: Text(
+                            video.split('/').last,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                _videos.remove(video);
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 // For now just a placeholder button
                 Center(
                   child: ElevatedButton(
@@ -782,6 +868,42 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
 
                       final box = Hive.box<Property>('properties');
 
+                      // ---------- COPY IMAGES & VIDEOS TO APP STORAGE ----------
+                      final List<String> savedImages = [];
+                      final List<String> savedVideos = [];
+
+                      // Images
+                      for (int i = 0; i < _images.length; i++) {
+                        final imagePath = _images[i];
+
+                        if (imagePath.contains("/properties/images/")) {
+                          savedImages.add(imagePath);
+                        } else {
+                          final copied = await MediaStorage.copyImage(
+                            imagePath,
+                            fullPropertyId,
+                            i + 1,
+                          );
+                          savedImages.add(copied);
+                        }
+                      }
+
+                      // Videos
+                      for (int i = 0; i < _videos.length; i++) {
+                        final videoPath = _videos[i];
+
+                        if (videoPath.contains("/properties/videos/")) {
+                          savedVideos.add(videoPath);
+                        } else {
+                          final copied = await MediaStorage.copyVideo(
+                            videoPath,
+                            fullPropertyId,
+                            i + 1,
+                          );
+                          savedVideos.add(copied);
+                        }
+                      }
+
                       // ---------- CREATE PROPERTY ----------
                       final newProperty = Property(
                         propertyId: fullPropertyId, // ✅ CORRECT PLACE
@@ -794,7 +916,8 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
                         pricePerSqft: _pricePerSqftController.text.isNotEmpty
                             ? _pricePerSqftController.text
                             : null,
-                        images: _images,
+                        images: savedImages,
+                        videos: savedVideos,
                         priceCategoryMax: _priceCategoryMax, // ✅ ADD THIS LINE
 
                         bhk: _bhk,
@@ -818,6 +941,21 @@ class _ListPropertyScreenState extends State<ListPropertyScreen> {
 
                         landAreaSqft: _landSqftController.text.trim().isNotEmpty
                             ? _landSqftController.text.trim()
+                            : null,
+
+                        commercialType: isVilla ? _villaType : _type,
+                        commercialSection: _commercialSection,
+
+                        shopNumber: _shopNumberController.text.isNotEmpty
+                            ? _shopNumberController.text
+                            : null,
+
+                        frontage: _frontageController.text.isNotEmpty
+                            ? _frontageController.text
+                            : null,
+
+                        totalSpace: _totalSpaceController.text.isNotEmpty
+                            ? _totalSpaceController.text
                             : null,
 
                         parking: _carParking,
