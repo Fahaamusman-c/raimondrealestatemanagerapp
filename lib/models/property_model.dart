@@ -328,7 +328,7 @@ class Property {
       furnishing: furnishing,
       pricePerSqft: pricePerSqft,
       propertyId: propertyId ?? this.propertyId, // ✅ FIX
-      isAvailable: isAvailable ?? this.isAvailable,
+      isAvailable: isAvailable ?? this.isAvailable , 
       landType: landType ?? this.landType,
       landArea: landArea ?? this.landArea,
       landAreaUnit: landAreaUnit ?? this.landAreaUnit,

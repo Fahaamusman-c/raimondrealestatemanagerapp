@@ -55,7 +55,7 @@ class CommercialCategoryScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const PropertyListScreen(
+        builder: (_) =>  PropertyListScreen(
           filterCategory: "Commercial",
           filterType: "Sale",
         ),
@@ -72,7 +72,7 @@ class CommercialCategoryScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const PropertyListScreen(
+        builder: (_) => PropertyListScreen(
           filterCategory: "Commercial",
           filterType: "Rent",
         ),
@@ -88,7 +88,7 @@ _buildButton(
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const PropertyListScreen(
+        builder: (_) =>  PropertyListScreen(
           filterCategory: "Commercial",
           filterType: "Lease",
         ),

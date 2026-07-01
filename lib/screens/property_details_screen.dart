@@ -20,6 +20,9 @@ import 'list_property_screen.dart';
 // ignore: unused_import
 import 'property_listing_screen.dart';
 import 'client_details_screen.dart';
+import '../widgets/property_video_player.dart';
+import '../utils/media_delete.dart';
+
 
 class PropertyDetailsScreen extends StatelessWidget {
   final Property property;
@@ -76,8 +79,7 @@ ${property.customLocation?.isNotEmpty == true ? "📍 Nearby: ${property.customL
     if (property.bathrooms != null) details.add("🚿 ${property.bathrooms} Ba");
     if (property.furnishing != null) details.add("🛋 ${property.furnishing}");
     if (property.sbua != null) details.add("📏 ${property.sbua} sqft");
-    if (property.carpetArea != null)
-      details.add("📐 ${property.carpetArea} sqft");
+    if (property.carpetArea != null) details.add("📐 ${property.carpetArea} sqft");
     if (property.parking != null) details.add("🚗 ${property.parking}");
     if (property.lift != null) {
       details.add("🛗 ${property.lift! ? "Yes" : "No"}");
@@ -129,7 +131,9 @@ ${property.customLocation?.isNotEmpty == true ? "📍 Nearby: ${property.customL
         details.add("🏷 ${property.landType}");
       }
     }
-
+    if (property.videos != null && property.videos!.isNotEmpty) {
+      details.add("🎥 ${property.videos!.length} Video(s)");
+    }
     // 🔹 ADD DETAILS LINE
     if (details.isNotEmpty) {
       text += "\n\n${details.join(" | ")}";
@@ -179,10 +183,26 @@ ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
 
     await Clipboard.setData(ClipboardData(text: cleanedText));
 
-    final imageFiles = property.images.map((path) => XFile(path)).toList();
+    final List<XFile> files = [];
 
-    if (imageFiles.isNotEmpty) {
-      await Share.shareXFiles(imageFiles, text: cleanedText);
+    // Images
+    for (final path in property.images) {
+      if (File(path).existsSync()) {
+        files.add(XFile(path));
+      }
+    }
+
+    // Videos
+    if (property.videos != null) {
+      for (final path in property.videos!) {
+        if (File(path).existsSync()) {
+          files.add(XFile(path));
+        }
+      }
+    }
+
+    if (files.isNotEmpty) {
+      await Share.shareXFiles(files, text: cleanedText);
     } else {
       await Share.share(cleanedText);
     }
@@ -326,6 +346,29 @@ ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
                           ),
 
                         const SizedBox(height: 20),
+
+                        if (property.videos != null &&
+                            property.videos!.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+
+                          const Text(
+                            "Videos",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          ...property.videos!.map(
+                            (video) => Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              child: PropertyVideoPlayer(videoPath: video),
+                            ),
+                          ),
+                        ],
 
                         // ---------- INFO ----------
                         // ---------- TITLE + LOCATION + PRICE ----------
@@ -680,6 +723,13 @@ ${profile.email.isNotEmpty ? "📧 ${profile.email}" : ""}
                               if (confirm == true) {
                                 final parentContext = context;
 
+                                // Delete copied images & videos first
+                                await MediaDelete.deletePropertyMedia(
+                                  images: property.images,
+                                  videos: property.videos,
+                                );
+
+                                // Then delete Hive record
                                 await box.deleteAt(index);
 
                                 if (!parentContext.mounted) return;

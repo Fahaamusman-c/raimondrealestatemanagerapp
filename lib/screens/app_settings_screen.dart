@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/property_migration.dart';
+
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
 
@@ -139,11 +141,68 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               items: ["Dark", "Light"],
               onChanged: (val) => setState(() => selectedTheme = val),
             ),
+            const SizedBox(height: 30),
+
+const Text(
+  "Maintenance",
+  style: TextStyle(
+    color: Colors.white,
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+const SizedBox(height: 12),
+
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    icon: const Icon(Icons.sync),
+    label: const Text("Migrate Existing Media"),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.orange,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+    ),
+    onPressed: () async {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Expanded(
+                child: Text("Migrating photos and videos..."),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      await PropertyMigration.migrateMedia();
+
+      if (!mounted) return;
+
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Migration completed successfully"),
+        ),
+      );
+    },
+  ),
+),
           ],
         ),
       ),
     );
   }
+  
 
   // 🔹 Reusable dropdown
   Widget _buildDropdown({
@@ -185,4 +244,5 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       borderRadius: BorderRadius.circular(10),
     );
   }
+  
 }

@@ -27,10 +27,7 @@ class VillasBuildingsCategoryScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                   const Text(
                     "Villas & Buildings",
@@ -49,51 +46,21 @@ class VillasBuildingsCategoryScreen extends StatelessWidget {
                 context,
                 "Sale",
                 Icons.sell,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PropertyListScreen(
-                        filterCategory: "Villas & Buildings",
-                        filterType: "Sale",
-                      ),
-                    ),
-                  );
-                },
+                "Sale",
               ),
 
               _buildButton(
                 context,
                 "Rent",
                 Icons.home_work,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PropertyListScreen(
-                        filterCategory: "Villas & Buildings",
-                        filterType: "Rent",
-                      ),
-                    ),
-                  );
-                },
+                "Rent",
               ),
 
               _buildButton(
                 context,
                 "Lease",
                 Icons.business_center,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PropertyListScreen(
-                        filterCategory: "Villas & Buildings",
-                        filterType: "Lease",
-                      ),
-                    ),
-                  );
-                },
+                "Lease",
               ),
 
               const Spacer(),
@@ -119,13 +86,10 @@ class VillasBuildingsCategoryScreen extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
-    VoidCallback onTap,
+    String type,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 30,
-        vertical: 10,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white.withValues(alpha: 0.15),
@@ -135,7 +99,17 @@ class VillasBuildingsCategoryScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        onPressed: onTap,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PropertyListScreen(
+                filterCategory: "Villas & Buildings",
+                filterType: type,
+              ),
+            ),
+          );
+        },
         icon: Icon(icon),
         label: Text(
           title,
